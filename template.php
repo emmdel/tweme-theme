@@ -59,7 +59,7 @@ function tweme_css_alter(&$css) {
  */
 function tweme_process_page(&$vars) {
   $page = $vars['page'];
-  
+
   // Provide additional variables to theme.
   $vars['brand'] = theme('brand', array(
     'name' => $vars['site_name'],
@@ -85,7 +85,7 @@ function tweme_process_page(&$vars) {
   // Render and clean up navbar search form.
   $vars['navbar_search'] = drupal_render($vars['navbar_search_form']);
   $vars['navbar_search'] = strip_tags($vars['navbar_search'], '<form><input>');
-  
+
   if (_tweme_is_tweme()) {
   // Prepare some useful variables.
     $vars['has_header'] = !empty($vars['title']) || !empty($vars['messages']);
@@ -226,6 +226,17 @@ function tweme_item_list($vars) {
 }
 
 /**
+ * Implements hook_js_alter().
+ */
+function tweme_js_alter(&$javascript) {
+  $key = _tweme_array_search_key_part('jquery_update/replace/jquery/1.7/jquery', $javascript);
+  if($key !== FALSE) {
+    $min = (strpos($key, '.min') == FALSE) ? '' : '.min';
+    $javascript[$key]['data'] = drupal_get_path('theme', 'tweme').'/assets/js/jquery-1.7.2' . $min . '.js';
+  }
+}
+
+/**
  * Helper function: returns a navbar search form.
  */
 function _tweme_search_form($form, &$form_state) {
@@ -250,4 +261,14 @@ function _tweme_search_form($form, &$form_state) {
 function _tweme_is_tweme() {
   global $theme;
   return $theme == 'tweme';
+}
+
+/**
+ * Helper function: search an array key part and return the first index or FALSE if not found
+ */
+function _tweme_array_search_key_part($needle, $haystack) {
+  foreach($haystack as $key => $val) {
+    if(strstr($key, $needle) !== FALSE) return $key;
+  }
+  return FALSE;
 }
